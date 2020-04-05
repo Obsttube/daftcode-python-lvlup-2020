@@ -22,7 +22,7 @@ def get_method(request: Request):
 
 class PatientRq(BaseModel):
     name: str
-    surname: str
+    surename: str
 
 
 class PatientResp(BaseModel):
