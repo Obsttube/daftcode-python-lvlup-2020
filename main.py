@@ -26,13 +26,15 @@ class PatientRq(BaseModel):
 
 
 class PatientResp(BaseModel):
-    id: int = app.num_of_patients
+    id: int
     patient: dict
 
 
 @app.post("/patient", response_model=PatientResp)
 def receive_patient(rq: PatientRq):
-    return PatientResp(patient=rq.dict())
+    patientResp = PatientResp(id=app.num_of_patients, patient=rq.dict())
+    app.num_of_patients += 1
+    return patientResp
 
 
 
