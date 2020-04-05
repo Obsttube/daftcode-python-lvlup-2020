@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 
 app = FastAPI()
+app.num_of_patients=0
 
 
 @app.get("/")
@@ -19,6 +20,24 @@ def root():
 def get_method(request: Request):
     return {"method": str(request.method)}
 
+class PatientRq(BaseModel):
+    name: str
+    surname: str
+
+
+class PatientResp(BaseModel):
+    id: int = app.num_of_patients
+    patient: dict
+
+
+@app.post("/patient", response_model=PatientResp)
+def receive_patient(rq: PatientRq):
+    return PatientResp(patient=rq.dict())
+
+
+
+
+
 class HelloResp(BaseModel):
     msg: str
 
@@ -26,17 +45,3 @@ class HelloResp(BaseModel):
 @app.get("/hello/{name}", response_model=HelloResp)
 def read_item(name: str):
     return HelloResp(msg=f"Hello {name}")
-
-
-class GiveMeSomethingRq(BaseModel):
-    first_key: str
-
-
-class GiveMeSomethingResp(BaseModel):
-    received: Dict
-    constant_data: str = "python jest super"
-
-
-@app.post("/dej/mi/coś", response_model=GiveMeSomethingResp)
-def receive_something(rq: GiveMeSomethingRq):
-    return GiveMeSomethingResp(received=rq.dict())
