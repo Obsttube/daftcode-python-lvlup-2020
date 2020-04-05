@@ -37,6 +37,6 @@ def receive_patient(rq: PatientRq):
 
 @app.get("/patient/{pk}")
 def get_patient(pk: int, response: Response):
-    if len(app.patients)<pk:
+    if len(app.patients)>pk:
         return app.patients[pk]
     response.status_code = status.HTTP_404_NOT_FOUND
