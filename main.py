@@ -39,4 +39,4 @@ def receive_patient(rq: PatientRq):
 def get_patient(pk: int, response: Response):
     if len(app.patients)>pk:
         return app.patients[pk]
-    response.status_code = status.HTTP_404_NOT_FOUND
+    response.status_code = status.HTTP_204_NO_CONTENT
