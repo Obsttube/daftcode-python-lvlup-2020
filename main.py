@@ -37,6 +37,7 @@ def receive_patient(rq: PatientRq):
 
 @app.get("/patient/{pk}")
 def get_patient(pk: int, response: Response):
+    response.status_code = status.HTTP_200_OK
     if len(app.patients)>pk:
         return app.patients[pk]
     response.status_code = status.HTTP_204_NO_CONTENT
