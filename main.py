@@ -31,11 +31,12 @@ class PatientResp(BaseModel):
 
 
 @app.post("/patient", response_model=PatientResp)
-def receive_patient(rq: PatientRq):
+def receive_patient(rq: PatientRq): 
     app.patients.append(rq.dict())
     return PatientResp(id=len(app.patients)-1, patient=rq.dict())
 
 @app.get("/patient/{pk}")
-def get_patient(pk: int):
+def get_patient(pk: int, response: Response, status_code=status.HTTP_200_OK):
     if len(app.patients)>pk:
         return app.patients[pk]
+    status_code = status.HTTP_204_NO_CONTENT
