@@ -1,12 +1,12 @@
 from typing import Dict
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response, status
 
 from pydantic import BaseModel
 
 
 app = FastAPI()
-app.num_of_patients=0
+app.patients=[]
 
 
 @app.get("/")
@@ -27,23 +27,16 @@ class PatientRq(BaseModel):
 
 class PatientResp(BaseModel):
     id: int
-    patient: dict
+    patient: Dict
 
 
 @app.post("/patient", response_model=PatientResp)
 def receive_patient(rq: PatientRq):
-    patientResp = PatientResp(id=app.num_of_patients, patient=rq.dict())
-    app.num_of_patients += 1
-    return patientResp
+    app.patients.append(rq.dict())
+    return PatientResp(id=len(app.patients)-1, patient=rq.dict())
 
-
-
-
-
-class HelloResp(BaseModel):
-    msg: str
-
-
-@app.get("/hello/{name}", response_model=HelloResp)
-def read_item(name: str):
-    return HelloResp(msg=f"Hello {name}")
+@app.get("/patient/{pk}")
+def get_patient(pk: int, response: Response):
+    if len(app.patients)<pk:
+        return app.patients[pk]
+    response.status_code = status.HTTP_404_NOT_FOUND
