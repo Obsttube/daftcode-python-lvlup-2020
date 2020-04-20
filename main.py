@@ -36,6 +36,7 @@ class LoginRq(BaseModel):
 @app.post("/login")
 def create_cookie(rq: LoginRq):#response: Response
     print(str(rq))
+    response.status_code = status.HTTP_401_UNAUTHORIZED
     return "ABC"+str(rq)
     '''print(user)
     print(password)
