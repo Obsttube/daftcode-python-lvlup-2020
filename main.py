@@ -20,7 +20,7 @@ def welcome():
 
 @app.post("/login")
 def create_cookie(response: Response, user: str = None, password: str = Query(None, alias="pass")):
-    if user == None:
+    if user == "trudnY":
         response.status_code = status.HTTP_302_FOUND
         response.headers["Location"] = "/welcome"
         session_token = sha256(bytes(f"{login}{password}{app.secret_key}", encoding='utf8')).hexdigest()
