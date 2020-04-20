@@ -25,7 +25,8 @@ def create_cookie(response: Response, login: str = None, password: str = Query(N
         response.headers["Location"] = "/welcome"
         session_token = sha256(bytes(f"{login}{password}{app.secret_key}", encoding='utf8')).hexdigest()
         response.set_cookie(key="session_token", value=session_token)
-    response.status_code = status.HTTP_401_UNAUTHORIZED
+    else:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
 
 @app.get("/method")
 @app.post("/method")
