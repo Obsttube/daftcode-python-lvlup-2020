@@ -10,6 +10,8 @@ from fastapi.responses import JSONResponse
 
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
+import secrets
+
 app = FastAPI()
 app.secret_key = "wUYwdjICbQP70WgUpRajUwxnGChAKmRtfQgYASazava4p5In7pZpFPggdB4JDjlv"
 app.patients=[]
@@ -32,11 +34,35 @@ def root():
 def welcome():
     return "Jakiś powitalny tekst!"
 
+def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, "trudnY")
+    correct_password = secrets.compare_digest(credentials.password, "PaC13Nt")
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect login or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
+
+
+@app.get("/login")
+def read_current_user(session_token: str = Depends(get_current_username)):
+    response.status_code = status.HTTP_302_FOUND
+    response.headers["Location"] = "/welcome"
+    response.set_cookie(key="session_token", value=session_token)
+
 @app.post("/login")
 def read_current_user(credentials: HTTPBasicCredentials = Depends(security)):
-    print({"username": credentials.username, "password": credentials.password})
-    return {"username": credentials.username, "password": credentials.password}
+    if credentials.username == "trudnY" and credentials.password == "PaC13Nt":
+        response.status_code = status.HTTP_302_FOUND
+        response.headers["Location"] = "/welcome"
+        session_token = sha256(bytes(f"{login}{password}{app.secret_key}", encoding='utf8')).hexdigest()
+        response.set_cookie(key="session_token", value=session_token)
+    else:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
 
+# wiem, że powinienem usunąć kod poniżej, ale 
 '''class LoginRq(BaseModel):
     login: str = None
     password: str = Query(None, alias="pass")
