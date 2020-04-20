@@ -19,8 +19,8 @@ def welcome():
     return "Jakiś powitalny tekst!"
 
 class LoginRq(BaseModel):
-    user: str = None
-    password: str = None
+    login: str = None
+    password: str = Query(None, alias="pass")
 
 @app.post("/login")
 def create_cookie(rq: LoginRq):#response: Response
