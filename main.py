@@ -1,11 +1,12 @@
 from typing import Dict
-
-from fastapi import FastAPI, Request, Response, status
-
+from hashlib import sha256
+from fastapi import FastAPI, Request, Response, Cookie, HTTPException
+from starlette.responses import RedirectResponse
 from pydantic import BaseModel
 
 
 app = FastAPI()
+app.secret_key = "wUYwdjICbQP70WgUpRajUwxnGChAKmRtfQgYASazava4p5In7pZpFPggdB4JDjlv"
 app.patients=[]
 
 
@@ -16,6 +17,12 @@ def root():
 @app.get("/welcome")
 def welcome():
     return "Jakiś powitalny tekst!"
+
+@app.post("/login")
+def create_cookie(login: str, pass: str, response: Response):
+    session_token = sha256(bytes(f"{login}{pass}{app.secret_key}")).hexdigest()
+    response.set_cookie(key="session_token", value=session_token)
+    return RedirectResponse(url="/welcome")
 
 @app.get("/method")
 @app.post("/method")
