@@ -53,7 +53,7 @@ def read_current_user(session_token: str = Depends(get_current_username)):
     response.set_cookie(key="session_token", value=session_token)'''
 
 @app.post("/login")
-def read_current_user(credentials: HTTPBasicCredentials = Depends(security)):
+def read_current_user(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
     if credentials.username == "trudnY" and credentials.password == "PaC13Nt":
         response.status_code = status.HTTP_302_FOUND
         response.headers["Location"] = "/welcome"
