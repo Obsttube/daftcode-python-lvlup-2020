@@ -52,7 +52,7 @@ def read_current_user(session_token: str = Depends(get_current_username)):
     response.headers["Location"] = "/welcome"
     response.set_cookie(key="session_token", value=session_token)
 
-@app.post("/login")
+'''@app.post("/login")
 def read_current_user(credentials: HTTPBasicCredentials = Depends(security)):
     if credentials.username == "trudnY" and credentials.password == "PaC13Nt":
         response.status_code = status.HTTP_302_FOUND
@@ -60,7 +60,7 @@ def read_current_user(credentials: HTTPBasicCredentials = Depends(security)):
         session_token = sha256(bytes(f"{login}{password}{app.secret_key}", encoding='utf8')).hexdigest()
         response.set_cookie(key="session_token", value=session_token)
     else:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
+        response.status_code = status.HTTP_401_UNAUTHORIZED'''
 
 # wiem, że powinienem usunąć kod poniżej, ale 
 '''class LoginRq(BaseModel):
