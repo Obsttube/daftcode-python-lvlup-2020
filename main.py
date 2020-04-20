@@ -19,8 +19,8 @@ def welcome():
     return "Jakiś powitalny tekst!"
 
 @app.post("/login")
-def create_cookie(login: str, pass: str, response: Response):
-    session_token = sha256(bytes(f"{login}{pass}{app.secret_key}")).hexdigest()
+def create_cookie(user: str, password: str, response: Response):
+    session_token = sha256(bytes(f"{user}{password}{app.secret_key}")).hexdigest()
     response.set_cookie(key="session_token", value=session_token)
     return RedirectResponse(url="/welcome")
 
