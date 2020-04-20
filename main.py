@@ -1,6 +1,6 @@
 from typing import Dict
 from hashlib import sha256
-from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Query, Body, Form
+from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Query, Body, Form, Depends
 from starlette.responses import RedirectResponse
 from pydantic import BaseModel
 
@@ -8,10 +8,13 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 app = FastAPI()
 app.secret_key = "wUYwdjICbQP70WgUpRajUwxnGChAKmRtfQgYASazava4p5In7pZpFPggdB4JDjlv"
 app.patients=[]
+
+security = HTTPBasic()
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -29,7 +32,12 @@ def root():
 def welcome():
     return "Jakiś powitalny tekst!"
 
-class LoginRq(BaseModel):
+@app.post("/login")
+def read_current_user(credentials: HTTPBasicCredentials = Depends(security)):
+    print({"username": credentials.username, "password": credentials.password})
+    return {"username": credentials.username, "password": credentials.password}
+
+'''class LoginRq(BaseModel):
     login: str = None
     password: str = Query(None, alias="pass")
 
@@ -37,8 +45,8 @@ class LoginRq(BaseModel):
 def create_cookie(response: Response, rq: LoginRq = None):#response: Response
     print(str(rq))
     response.status_code = status.HTTP_401_UNAUTHORIZED
-    return "ABC"+str(rq)
-    '''print(user)
+    return "ABC"+str(rq)'''
+'''print(user)
     print(password)
     if user == "trudnY":
         response.status_code = status.HTTP_302_FOUND
