@@ -14,7 +14,7 @@ app.patients=[]
 def root():
     return {"message": "Hello World during the coronavirus pandemic!"}
 
-@app.get("/welcome")
+@app.get("/hello")
 def welcome():
     return "Jakiś powitalny tekst!"
 
