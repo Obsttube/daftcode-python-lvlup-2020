@@ -4,11 +4,21 @@ from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Q
 from starlette.responses import RedirectResponse
 from pydantic import BaseModel
 
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+
 
 app = FastAPI()
 app.secret_key = "wUYwdjICbQP70WgUpRajUwxnGChAKmRtfQgYASazava4p5In7pZpFPggdB4JDjlv"
 app.patients=[]
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
+    )
 
 @app.get("/")
 def root():
@@ -25,7 +35,7 @@ class LoginRq(BaseModel):
 @app.post("/login")
 def create_cookie(rq: LoginRq):#response: Response
     print(str(rq))
-    return str(rq)
+    return "ABC"+str(rq)
     '''print(user)
     print(password)
     if user == "trudnY":
