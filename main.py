@@ -1,6 +1,6 @@
 from typing import Dict
 from hashlib import sha256
-from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException
+from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Query
 from starlette.responses import RedirectResponse
 from pydantic import BaseModel
 
@@ -19,10 +19,10 @@ def welcome():
     return "Jakiś powitalny tekst!"
 
 @app.post("/login")
-def create_cookie(user: str, password: str, response: Response):
+def create_cookie(response: Response, user: str, password: str = Query(None, alias="pass")):
     session_token = sha256(bytes(f"{user}{password}{app.secret_key}")).hexdigest()
     response.set_cookie(key="session_token", value=session_token)
-    return RedirectResponse(url="/welcome")
+    return RedirectResponse(url="/welcome", status_code=HTTP_302_FOUND)
 
 @app.get("/method")
 @app.post("/method")
