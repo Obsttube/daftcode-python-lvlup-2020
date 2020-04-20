@@ -1,6 +1,6 @@
 from typing import Dict
 from hashlib import sha256
-from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Query
+from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Query, Body, Form
 from starlette.responses import RedirectResponse
 from pydantic import BaseModel
 
@@ -18,9 +18,15 @@ def root():
 def welcome():
     return "Jakiś powitalny tekst!"
 
+class LoginRq(BaseModel):
+    user: str = None
+    password: str = None
+
 @app.post("/login")
-def create_cookie(response: Response, user: str = None, password: str = Query(None, alias="pass")):
-    print(user)
+def create_cookie(rq: LoginRq):#response: Response
+    print(str(rq))
+    return str(rq)
+    '''print(user)
     print(password)
     if user == "trudnY":
         response.status_code = status.HTTP_302_FOUND
@@ -28,7 +34,7 @@ def create_cookie(response: Response, user: str = None, password: str = Query(No
         session_token = sha256(bytes(f"{login}{password}{app.secret_key}", encoding='utf8')).hexdigest()
         response.set_cookie(key="session_token", value=session_token)
     else:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
+        response.status_code = status.HTTP_401_UNAUTHORIZED'''
 
 @app.get("/method")
 @app.post("/method")
