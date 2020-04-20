@@ -1,6 +1,6 @@
 from typing import Dict
 from hashlib import sha256
-from fastapi import FastAPI, Request, Response, Cookie, HTTPException
+from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException
 from starlette.responses import RedirectResponse
 from pydantic import BaseModel
 
