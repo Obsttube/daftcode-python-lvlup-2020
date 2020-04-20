@@ -14,16 +14,17 @@ app.patients=[]
 def root():
     return {"message": "Hello World during the coronavirus pandemic!"}
 
-@app.get("/hello")
+@app.get("/welcome")
 def welcome():
     return "Jakiś powitalny tekst!"
 
 @app.post("/login")
 def create_cookie(response: Response, login: str = None, password: str = Query(None, alias="pass")):
-    #response.status_code = status.HTTP_302_FOUND#HTTP_401_UNAUTHORIZED
+    response.status_code = status.HTTP_302_FOUND#HTTP_401_UNAUTHORIZED
+    response.headers["Location"] = "/welcome"
     #session_token = sha256(bytes(f"{login}{password}{app.secret_key}", encoding='utf8')).hexdigest()
     #response.set_cookie(key="session_token", value=session_token)
-    return RedirectResponse(url="/hello", status_code=status.HTTP_302_FOUND)
+    #return RedirectResponse(url="/hello", status_code=status.HTTP_302_FOUND)
 
 @app.get("/method")
 @app.post("/method")
