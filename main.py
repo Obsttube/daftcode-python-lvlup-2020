@@ -20,6 +20,8 @@ def welcome():
 
 @app.post("/login")
 def create_cookie(response: Response, user: str = None, password: str = Query(None, alias="pass")):
+    print(user)
+    print(password)
     if user == "trudnY":
         response.status_code = status.HTTP_302_FOUND
         response.headers["Location"] = "/welcome"
