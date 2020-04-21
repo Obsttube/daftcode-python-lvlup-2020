@@ -104,7 +104,8 @@ class PatientRq(BaseModel):
     surname: str
 
 @app.post("/patient")
-def add_patient(response: Response, rq: PatientRq, session_token: str = Depends(check_cookie)):
+def add_patient(response: Response, rq: PatientRq, session_token: str = Cookie(None)):
+    print(session_token)
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
@@ -116,7 +117,8 @@ def add_patient(response: Response, rq: PatientRq, session_token: str = Depends(
     print(app.patients)
 
 @app.get("/patient")
-def get_all_patients(response: Response, session_token: str = Depends(check_cookie)):
+def get_all_patients(response: Response, session_token: str = Cookie(None)):
+    print(session_token)
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
@@ -124,7 +126,8 @@ def get_all_patients(response: Response, session_token: str = Depends(check_cook
     return app.patients
 
 @app.get("/patient/{pid}")
-def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK, session_token: str = Depends(check_cookie)):
+def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK, session_token: str = Cookie(None)):
+    print(session_token)
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
@@ -135,7 +138,8 @@ def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK, se
     response.status_code = status.HTTP_204_NO_CONTENT
 
 @app.delete("/patient/{pid}")
-def remove_patient(pid: str, response: Response, session_token: str = Depends(check_cookie)):
+def remove_patient(pid: str, response: Response, session_token: str = Cookie(None)):
+    print(session_token)
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
