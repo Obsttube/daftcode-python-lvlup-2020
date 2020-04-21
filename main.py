@@ -1,11 +1,11 @@
 from hashlib import sha256
-from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Body, Depends
+from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Depends
 from pydantic import BaseModel
 
 # for debug
-from fastapi.encoders import jsonable_encoder
+'''from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse'''
 # end
 
 from fastapi.templating import Jinja2Templates
@@ -23,13 +23,13 @@ app.users={"trudnY":"PaC13Nt"}
 app.sessions={}
 
 # for debug
-@app.exception_handler(RequestValidationError)
+'''@app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     print(jsonable_encoder({"detail": exc.errors(), "body": exc.body}))
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
-    )
+    )'''
 # end
 
 @app.get("/")
@@ -67,14 +67,14 @@ def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
     return session_token
 
 
-@app.get("/login") # for easier testing in the browser
+#@app.get("/login") # for easier testing in the browser
 @app.post("/login")
 def login(response: Response, session_token: str = Depends(login_check_cred)):
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/welcome"
     response.set_cookie(key="session_token", value=session_token)
 
-@app.get("/logout") # for easier testing in the browser
+#@app.get("/logout") # for easier testing in the browser
 @app.post("/logout")
 def logout(response: Response, session_token: str = Depends(check_cookie)):
     if session_token is None:
@@ -95,19 +95,17 @@ class PatientRq(BaseModel):
     name: str
     surname: str
 
+# note: it is possible to use "name: str = Body(None), surname..." instead of "rq: PatientRq"
 @app.post("/patient")
-def add_patient(response: Response, name: str = Body(None), surname: str = Body(None), session_token: str = Depends(check_cookie)):
-    print(name)
-    print(surname)
-    print("^^^^^^^^")
-    '''if session_token is None:
+def add_patient(response: Response, rq: PatientRq, session_token: str = Depends(check_cookie)):
+    if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
     pid=f"id_{app.next_patient_id}"
     app.patients[pid]=rq.dict()
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = f"/patient/{pid}"
-    app.next_patient_id+=1'''
+    app.next_patient_id+=1
 
 @app.get("/patient")
 def get_all_patients(response: Response, session_token: str = Depends(check_cookie)):
