@@ -36,7 +36,7 @@ def root():
 def welcome():
     return "Jakiś powitalny tekst!"
 
-def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
+def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, "trudnY")
     correct_password = secrets.compare_digest(credentials.password, "PaC13Nt")
     if not (correct_username and correct_password):
@@ -49,40 +49,10 @@ def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
 
 
 @app.post("/login")
-def read_current_user(response: Response, session_token: str = Depends(get_current_username)):
+def login(response: Response, session_token: str = Depends(login_check_cred)):
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/welcome"
     response.set_cookie(key="session_token", value=session_token)
-
-'''@app.post("/login")
-def read_current_user(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
-    if credentials.username == "trudnY" and credentials.password == "PaC13Nt":
-        response.status_code = status.HTTP_302_FOUND
-        response.headers["Location"] = "/welcome"
-        session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
-        response.set_cookie(key="session_token", value=session_token)
-    else:
-        response.status_code = status.HTTP_401_UNAUTHORIZED'''
-
-# wiem, że powinienem usunąć kod poniżej, ale 
-'''class LoginRq(BaseModel):
-    login: str = None
-    password: str = Query(None, alias="pass")
-
-@app.post("/login")
-def create_cookie(response: Response, rq: LoginRq = None):#response: Response
-    print(str(rq))
-    response.status_code = status.HTTP_401_UNAUTHORIZED
-    return "ABC"+str(rq)'''
-'''print(user)
-    print(password)
-    if user == "trudnY":
-        response.status_code = status.HTTP_302_FOUND
-        response.headers["Location"] = "/welcome"
-        session_token = sha256(bytes(f"{login}{password}{app.secret_key}", encoding='utf8')).hexdigest()
-        response.set_cookie(key="session_token", value=session_token)
-    else:
-        response.status_code = status.HTTP_401_UNAUTHORIZED'''
 
 @app.get("/method")
 @app.post("/method")
