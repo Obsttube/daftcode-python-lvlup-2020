@@ -117,7 +117,7 @@ def get_all_patients(response: Response, session_token: str = Depends(check_cook
     response.status_code = status.HTTP_204_NO_CONTENT
 
 @app.get("/patient/{pid}")
-def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK, session_token: str = Depends(check_cookie)):
+def get_patient(pid: str, response: Response, session_token: str = Depends(check_cookie)):
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
