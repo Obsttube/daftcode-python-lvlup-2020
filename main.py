@@ -19,7 +19,8 @@ app = FastAPI()
 security = HTTPBasic()
 templates = Jinja2Templates(directory="templates")
 app.secret_key = "wUYwdjICbQP70WgUpRajUwxnGChAKmRtfQgYASazava4p5In7pZpFPggdB4JDjlv"
-app.patients=[]
+app.patients={}#{"id_1": {"name": "IMIE", "surname": "NAZWISKO"}, "id_2": {"name": "IMIE", "surname": "NAZWISKO"}}
+app.next_patient_id=0
 app.users={"trudnY":"PaC13Nt"}
 app.sessions={}
 
@@ -39,15 +40,14 @@ def root():
 
 def check_cookie(session_token: str = Cookie(None)):
     if session_token not in app.sessions:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect login or password",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+        session_token = None
     return session_token
 
 @app.get("/welcome")
-def welcome(request: Request, session_token: str = Depends(check_cookie)):
+def welcome(request: Request, response: Response, session_token: str = Depends(check_cookie)):
+    if session_token is None:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return "Log in to access this page."
     username = app.sessions[session_token]
     return templates.TemplateResponse("welcome.html", {"request": request, "user": username})
 
@@ -69,14 +69,19 @@ def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
     return session_token
 
 
+@app.get("/login") # for easier testing in the browser
 @app.post("/login")
 def login(response: Response, session_token: str = Depends(login_check_cred)):
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/welcome"
     response.set_cookie(key="session_token", value=session_token)
 
+@app.get("/logout") # for easier testing in the browser
 @app.post("/logout")
 def logout(response: Response, session_token: str = Depends(check_cookie)):
+    if session_token is None:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return "Log in to access this page."
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/"
     app.sessions.pop(session_token)
@@ -90,21 +95,26 @@ def get_method(request: Request):
 
 class PatientRq(BaseModel):
     name: str
-    surename: str
+    surname: str
 
+@app.post("/patient")
+def add_patient(response: Response, rq: PatientRq): 
+    pid="id_{app.next_patient_id}"
+    app.patients[pid]=rq.dict()
+    response.status_code = status.HTTP_302_FOUND
+    response.headers["Location"] = "/patient/{pid}"
+    app.next_patient_id+=1
 
-class PatientResp(BaseModel):
-    id: int
-    patient: Dict
+@app.get("/patient")
+def get_all_patients(): 
+    return app.patients
 
-
-@app.post("/patient", response_model=PatientResp)
-def receive_patient(rq: PatientRq): 
-    app.patients.append(rq.dict())
-    return PatientResp(id=len(app.patients)-1, patient=rq.dict())
-
-@app.get("/patient/{pk}")
-def get_patient(pk: int, response: Response, status_code=status.HTTP_200_OK):
-    if len(app.patients)>pk:
-        return app.patients[pk]
+@app.get("/patient/{pid}")
+def get_patient(pid: str, response: Response):
+    if pid in app.patients:
+        return app.patients[pid]
     response.status_code = status.HTTP_204_NO_CONTENT
+
+@app.delete("/patient/{pid}")
+def remove_patient(pid: int, response: Response):
+    app.patients.pop(pid, None)
