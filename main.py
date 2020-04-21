@@ -35,8 +35,17 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 def root():
     return {"message": "Hello World during the coronavirus pandemic!"}
 
+def check_cookie(session_token: str = Cookie(None)):
+    if session_token not in app.sessions:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect login or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return session_token
+
 @app.get("/welcome")
-def welcome():
+def welcome(session_token: str = Depends(check_cookie)):
     return "Jakiś powitalny tekst!"
 
 def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
