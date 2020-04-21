@@ -55,6 +55,8 @@ def welcome(request: Request, response: Response, session_token: str = Depends(c
 
 def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
     correct = False
+    print(credentials.username)
+    print(credentials.password)
     for username, password in app.users.items():
         correct_username = secrets.compare_digest(credentials.username, username)
         correct_password = secrets.compare_digest(credentials.password, password)
