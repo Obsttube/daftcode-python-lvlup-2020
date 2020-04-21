@@ -115,7 +115,7 @@ def get_all_patients():
     return app.patients
 
 @app.get("/patient/{pid}")
-def get_patient(pid: str, response: Response):
+def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK):
     print(pid)
     if pid in app.patients:
         print(app.patients[pid])
