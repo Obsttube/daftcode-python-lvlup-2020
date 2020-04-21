@@ -99,10 +99,10 @@ class PatientRq(BaseModel):
 
 @app.post("/patient")
 def add_patient(response: Response, rq: PatientRq): 
-    pid="id_{app.next_patient_id}"
+    pid=f"id_{app.next_patient_id}"
     app.patients[pid]=rq.dict()
     response.status_code = status.HTTP_302_FOUND
-    response.headers["Location"] = "/patient/{pid}"
+    response.headers["Location"] = f"/patient/{pid}"
     app.next_patient_id+=1
     print(app.patients)
 
@@ -113,8 +113,8 @@ def get_all_patients():
 @app.get("/patient/{pid}")
 def get_patient(pid: str, response: Response):
     print(pid)
-    print(app.patients[pid])
     if pid in app.patients:
+        print(app.patients[pid])
         return app.patients[pid]
     response.status_code = status.HTTP_204_NO_CONTENT
 
