@@ -110,18 +110,22 @@ def add_patient(response: Response, rq: PatientRq, session_token: str = Depends(
     print(app.patients)
 
 @app.get("/patient")
-def get_all_patients(response: Response, session_token: str = Depends(check_cookie)):
-    '''if session_token is None:
+def get_all_patients(response: Response, session_token: str = Depends(check_cookie), test: str = Cookie(None)):
+    print(test)
+    print(app.sessions)
+    if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return "Log in to access this page."'''
+        return "Log in to access this page."
     print(app.patients)
     return app.patients
 
 @app.get("/patient/{pid}")
-def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK, session_token: str = Depends(check_cookie)):
-    '''if session_token is None:
+def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK, session_token: str = Depends(check_cookie), test: str = Cookie(None)):
+    print(test)
+    print(app.sessions)
+    if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return "Log in to access this page."'''
+        return "Log in to access this page."
     print(pid)
     if pid in app.patients:
         print(app.patients[pid])
