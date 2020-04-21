@@ -144,3 +144,4 @@ def remove_patient(pid: str, response: Response, session_token: str = Depends(ch
     print(app.patients)
     app.patients.pop(pid, None)
     print(app.patients)
+    response.status_code = status.HTTP_204_NO_CONTENT
