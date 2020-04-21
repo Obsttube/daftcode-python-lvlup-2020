@@ -14,6 +14,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from time import sleep
+import random
 
 import secrets
 
@@ -25,6 +26,11 @@ app.patients={}#{"id_1": {"name": "IMIE", "surname": "NAZWISKO"}, "id_2": {"name
 app.next_patient_id=0
 app.users={"trudnY":"PaC13Nt"}
 app.sessions={}
+app.testtt=random.random()
+
+@app.get("/test")
+def root():
+    return {"message": app.testtt}
 
 # for debug
 @app.exception_handler(RequestValidationError)
