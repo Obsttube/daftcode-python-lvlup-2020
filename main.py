@@ -119,6 +119,6 @@ def get_patient(pid: str, response: Response):
     response.status_code = status.HTTP_204_NO_CONTENT
 
 @app.delete("/patient/{pid}")
-def remove_patient(pid: int, response: Response):
+def remove_patient(pid: str, response: Response):
     app.patients.pop(pid, None)
     print(app.patients)
