@@ -39,6 +39,8 @@ def root():
     return {"message": "Hello World during the coronavirus pandemic!"}
 
 def check_cookie(session_token: str = Cookie(None)):
+    print(session_token)
+    print(app.sessions)
     if session_token not in app.sessions:
         session_token = None
     return session_token
@@ -110,9 +112,7 @@ def add_patient(response: Response, rq: PatientRq, session_token: str = Depends(
     print(app.patients)
 
 @app.get("/patient")
-def get_all_patients(response: Response, session_token: str = Depends(check_cookie), test: str = Cookie(None)):
-    print(test)
-    print(app.sessions)
+def get_all_patients(response: Response, session_token: str = Depends(check_cookie)):
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
@@ -120,9 +120,7 @@ def get_all_patients(response: Response, session_token: str = Depends(check_cook
     return app.patients
 
 @app.get("/patient/{pid}")
-def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK, session_token: str = Depends(check_cookie), test: str = Cookie(None)):
-    print(test)
-    print(app.sessions)
+def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK, session_token: str = Depends(check_cookie)):
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
