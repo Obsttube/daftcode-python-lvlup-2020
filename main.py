@@ -62,9 +62,11 @@ def login(response: Response, session_token: str = Depends(login_check_cred)):
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/welcome"
     response.set_cookie(key="session_token", value=session_token)
+    print(session_token)
 
 @app.post("/logout")
 def logout(response: Response, session_token: str = Cookie(None)):
+    print(session_token)
     if session_token not in app.sessions:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
