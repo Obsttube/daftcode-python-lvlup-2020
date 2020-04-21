@@ -19,6 +19,9 @@ app.patients=[]
 
 security = HTTPBasic()
 
+app.users=[{"username":"trudnY", "password":"PaC13Nt"}]
+app.sessions=[]
+
 # for debug
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -37,9 +40,13 @@ def welcome():
     return "Jakiś powitalny tekst!"
 
 def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
-    correct_username = secrets.compare_digest(credentials.username, "trudnY")
-    correct_password = secrets.compare_digest(credentials.password, "PaC13Nt")
-    if not (correct_username and correct_password):
+    correct = False
+    for user in app.users:
+        correct_username = secrets.compare_digest(credentials.username, user.username)
+        correct_password = secrets.compare_digest(credentials.password, user.password)
+        if (correct_username and correct_password):
+            correct = True
+    if not correct:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect login or password",
