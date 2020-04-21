@@ -1,18 +1,15 @@
-from hashlib import sha256
 from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Depends
-from pydantic import BaseModel, Field
-
-from functools import wraps
-# for debug
-from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-# end
-
-from fastapi.templating import Jinja2Templates
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
+from hashlib import sha256
 import secrets
+
+# for debug
+'''from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse'''
+# end
 
 app = FastAPI()
 security = HTTPBasic()
@@ -23,14 +20,16 @@ app.next_patient_id=0
 app.users={"trudnY":"PaC13Nt"}
 app.sessions={}
 
+MESSAGE_UNAUTHORIZED = "Log in to access this page."
+
 # for debug
-@app.exception_handler(RequestValidationError)
+'''@app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     print(jsonable_encoder({"detail": exc.errors(), "body": exc.body}))
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
-    )
+    )'''
 # end
 
 @app.get("/")
@@ -42,18 +41,11 @@ def check_cookie(session_token: str = Cookie(None)):
         session_token = None
     return session_token
 
-'''class WelcomeRq(BaseModel):
-    pass
-
-@app.get("/welcome")
-def welcome(request: Request, response: Response, rq: WelcomeRq = BaseModel(), session_token: str = Cookie(None)):
-    print(session_token)'''
-
 @app.get("/welcome")
 def welcome(request: Request, response: Response, session_token: str = Depends(check_cookie)):
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return "Log in to access this page."
+        return MESSAGE_UNAUTHORIZED
     username = app.sessions[session_token]
     return templates.TemplateResponse("welcome.html", {"request": request, "user": username})
 
@@ -87,7 +79,7 @@ def login(response: Response, session_token: str = Depends(login_check_cred)):
 def logout(response: Response, session_token: str = Depends(check_cookie)):
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return "Log in to access this page."
+        return MESSAGE_UNAUTHORIZED
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/"
     app.sessions.pop(session_token)
@@ -108,7 +100,7 @@ class PatientRq(BaseModel):
 def add_patient(response: Response, rq: PatientRq, session_token: str = Depends(check_cookie)):
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return "Log in to access this page."
+        return MESSAGE_UNAUTHORIZED
     pid=f"id_{app.next_patient_id}"
     app.patients[pid]=rq.dict()
     response.status_code = status.HTTP_302_FOUND
@@ -119,7 +111,7 @@ def add_patient(response: Response, rq: PatientRq, session_token: str = Depends(
 def get_all_patients(response: Response, session_token: str = Depends(check_cookie)):
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return "Log in to access this page."
+        return MESSAGE_UNAUTHORIZED
     if len(app.patients) != 0:
         return app.patients
     response.status_code = status.HTTP_204_NO_CONTENT
@@ -128,19 +120,15 @@ def get_all_patients(response: Response, session_token: str = Depends(check_cook
 def get_patient(pid: str, response: Response, session_token: str = Depends(check_cookie)):
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return "Log in to access this page."
+        return MESSAGE_UNAUTHORIZED
     if pid in app.patients:
         return app.patients[pid]
     response.status_code = status.HTTP_204_NO_CONTENT
 
-class WelcomeRq(BaseModel):
-    pid: str
-
-@app.delete("/patient/{rq}")
-def remove_patient(rq: WelcomeRq, response: Response, session_token: str = Depends(check_cookie)):
-    print(rq)
-    '''if session_token is None:
+@app.delete("/patient/{pid}")
+def remove_patient(pid: str, response: Response, session_token: str = Depends(check_cookie)):
+    if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return "Log in to access this page."
+        return MESSAGE_UNAUTHORIZED
     app.patients.pop(pid, None)
-    response.status_code = status.HTTP_204_NO_CONTENT'''
+    response.status_code = status.HTTP_204_NO_CONTENT
