@@ -130,9 +130,9 @@ def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK, se
 
 @app.delete("/patient/{pid}")
 def remove_patient(pid: str, response: Response, session_token: str = Depends(check_cookie)):
-    if session_token is None:
+    '''if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return "Log in to access this page."
+        return "Log in to access this page."'''
     print(app.patients)
     app.patients.pop(pid, None)
     print(app.patients)
