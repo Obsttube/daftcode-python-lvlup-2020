@@ -55,7 +55,7 @@ def login(response: Response, session_token: str = Depends(login_check_cred)):
     response.set_cookie(key="session_token", value=session_token)
 
 @app.post("/logout")
-def logout():
+def logout(response: Response):
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/"
 
