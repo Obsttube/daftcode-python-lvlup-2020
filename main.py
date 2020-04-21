@@ -42,8 +42,8 @@ def welcome():
 def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
     correct = False
     for user in app.users:
-        correct_username = secrets.compare_digest(credentials.username, user.username)
-        correct_password = secrets.compare_digest(credentials.password, user.password)
+        correct_username = secrets.compare_digest(credentials.username, user.get("username"))
+        correct_password = secrets.compare_digest(credentials.password, user.get("password"))
         if (correct_username and correct_password):
             correct = True
     if not correct:
