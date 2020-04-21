@@ -47,7 +47,7 @@ def welcome():
 
 
 @app.get("/login")
-def read_current_user(session_token: str = Depends(get_current_username)):
+def read_current_user(response: Response, session_token: str = Depends(get_current_username)):
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/welcome"
     response.set_cookie(key="session_token", value=session_token)'''
@@ -57,7 +57,7 @@ def read_current_user(response: Response, credentials: HTTPBasicCredentials = De
     if credentials.username == "trudnY" and credentials.password == "PaC13Nt":
         response.status_code = status.HTTP_302_FOUND
         response.headers["Location"] = "/welcome"
-        session_token = sha256(bytes(f"{login}{password}{app.secret_key}", encoding='utf8')).hexdigest()
+        session_token = sha256(bytes(f"{credentials.login}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
         response.set_cookie(key="session_token", value=session_token)
     else:
         response.status_code = status.HTTP_401_UNAUTHORIZED
