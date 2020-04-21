@@ -1,7 +1,8 @@
 from hashlib import sha256
 from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from functools import wraps
 # for debug
 '''from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -40,6 +41,13 @@ def check_cookie(session_token: str = Cookie(None)):
     if session_token not in app.sessions:
         session_token = None
     return session_token
+
+'''class WelcomeRq(BaseModel):
+    pass
+
+@app.get("/welcome")
+def welcome(request: Request, response: Response, rq: WelcomeRq = BaseModel(), session_token: str = Cookie(None)):
+    print(session_token)'''
 
 @app.get("/welcome")
 def welcome(request: Request, response: Response, session_token: str = Depends(check_cookie)):
@@ -125,8 +133,12 @@ def get_patient(pid: str, response: Response, session_token: str = Depends(check
         return app.patients[pid]
     response.status_code = status.HTTP_204_NO_CONTENT
 
+class WelcomeRq(BaseModel):
+    pid: str
+
 @app.delete("/patient/{pid}")
-def remove_patient(pid: str, response: Response, session_token: str = Depends(check_cookie)):
+def remove_patient(rq: WelcomeRq, response: Response, session_token: str = Depends(check_cookie)):
+    print(rq)
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
