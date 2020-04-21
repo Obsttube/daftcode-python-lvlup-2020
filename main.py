@@ -1,7 +1,5 @@
-from typing import Dict
 from hashlib import sha256
-from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Query, Body, Form, Depends
-from starlette.responses import RedirectResponse
+from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Body, Depends
 from pydantic import BaseModel
 
 # for debug
@@ -98,7 +96,7 @@ class PatientRq(BaseModel):
     surname: str
 
 @app.post("/patient")
-def add_patient(response: Response, name: str = Form(None), surname: str = Form(None), session_token: str = Depends(check_cookie)):
+def add_patient(response: Response, name: str = Body(None), surname: str = Body(None), session_token: str = Depends(check_cookie)):
     print(name)
     print(surname)
     print("^^^^^^^^")
