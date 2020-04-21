@@ -76,6 +76,8 @@ def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
 @app.get("/login") # for easier testing in the browser
 @app.post("/login")
 def login(response: Response, session_token: str = Depends(login_check_cred)):
+    print("login")
+    print(session_token)
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/welcome"
     response.set_cookie(key="session_token", value=session_token)
