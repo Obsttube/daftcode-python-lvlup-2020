@@ -13,6 +13,8 @@ from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
+from time import sleep
+
 import secrets
 
 app = FastAPI()
@@ -107,7 +109,8 @@ def add_patient(response: Response, rq: PatientRq):
     print(app.patients)
 
 @app.get("/patient")
-def get_all_patients(): 
+def get_all_patients():
+    sleep(0.5) 
     print(app.patients)
     return app.patients
 
@@ -121,5 +124,6 @@ def get_patient(pid: str, response: Response):
 
 @app.delete("/patient/{pid}")
 def remove_patient(pid: str, response: Response):
+    print(app.patients)
     app.patients.pop(pid, None)
     print(app.patients)
