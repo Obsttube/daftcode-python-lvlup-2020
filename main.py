@@ -64,9 +64,16 @@ def login(response: Response, session_token: str = Depends(login_check_cred)):
     response.set_cookie(key="session_token", value=session_token)
 
 @app.post("/logout")
-def logout(response: Response):
+def logout(response: Response, session_token: str = Cookie(None)):
+    if session_token not in app.sessions:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect login or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/"
+    app.sessions.pop(session_token)
 
 @app.get("/method")
 @app.post("/method")
