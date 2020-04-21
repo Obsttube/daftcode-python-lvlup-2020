@@ -8,17 +8,18 @@ from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+# end
 
+from fastapi.templating import Jinja2Templates
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 import secrets
 
 app = FastAPI()
+security = HTTPBasic()
+templates = Jinja2Templates(directory="templates")
 app.secret_key = "wUYwdjICbQP70WgUpRajUwxnGChAKmRtfQgYASazava4p5In7pZpFPggdB4JDjlv"
 app.patients=[]
-
-security = HTTPBasic()
-
 app.users={"trudnY":"PaC13Nt"}
 app.sessions={}
 
@@ -30,6 +31,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
     )
+# end
 
 @app.get("/")
 def root():
@@ -45,8 +47,9 @@ def check_cookie(session_token: str = Cookie(None)):
     return session_token
 
 @app.get("/welcome")
-def welcome(session_token: str = Depends(check_cookie)):
-    return "Jakiś powitalny tekst!"
+def welcome(request: Request, session_token: str = Depends(check_cookie)):
+    username = app.sessions[session_token]
+    return templates.TemplateResponse("welcome.html", {"request": request, "user": username})
 
 def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
     correct = False
@@ -73,13 +76,7 @@ def login(response: Response, session_token: str = Depends(login_check_cred)):
     response.set_cookie(key="session_token", value=session_token)
 
 @app.post("/logout")
-def logout(response: Response, session_token: str = Cookie(None)):
-    if session_token not in app.sessions:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect login or password",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+def logout(response: Response, session_token: str = Depends(check_cookie)):
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/"
     app.sessions.pop(session_token)
