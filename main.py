@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request, Response, status, Cookie, HTTPException, Q
 from starlette.responses import RedirectResponse
 from pydantic import BaseModel
 
+# for debug
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -18,6 +19,7 @@ app.patients=[]
 
 security = HTTPBasic()
 
+# for debug
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     print(jsonable_encoder({"detail": exc.errors(), "body": exc.body}))
@@ -46,7 +48,7 @@ def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
     return sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
 
 
-@app.get("/login")
+@app.post("/login")
 def read_current_user(response: Response, session_token: str = Depends(get_current_username)):
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/welcome"
