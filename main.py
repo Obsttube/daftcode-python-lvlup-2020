@@ -98,7 +98,7 @@ class PatientRq(BaseModel):
     surname: str
 
 @app.post("/patient")
-def add_patient(response: Response, name: str = Query(), surname: str = Query(), session_token: str = Depends(check_cookie)):
+def add_patient(response: Response, name: str = Query(None), surname: str = Query(None), session_token: str = Depends(check_cookie)):
     print(name)
     print(surname)
     print("^^^^^^^^")
