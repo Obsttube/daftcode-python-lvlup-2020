@@ -104,6 +104,7 @@ def add_patient(response: Response, rq: PatientRq):
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/patient/{pid}"
     app.next_patient_id+=1
+    print(app.patients)
 
 @app.get("/patient")
 def get_all_patients(): 
@@ -111,6 +112,8 @@ def get_all_patients():
 
 @app.get("/patient/{pid}")
 def get_patient(pid: str, response: Response):
+    print(pid)
+    print(app.patients[pid])
     if pid in app.patients:
         return app.patients[pid]
     response.status_code = status.HTTP_204_NO_CONTENT
@@ -118,3 +121,4 @@ def get_patient(pid: str, response: Response):
 @app.delete("/patient/{pid}")
 def remove_patient(pid: int, response: Response):
     app.patients.pop(pid, None)
+    print(app.patients)
