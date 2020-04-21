@@ -19,7 +19,7 @@ app = FastAPI()
 security = HTTPBasic()
 templates = Jinja2Templates(directory="templates")
 app.secret_key = "wUYwdjICbQP70WgUpRajUwxnGChAKmRtfQgYASazava4p5In7pZpFPggdB4JDjlv"
-app.patients={}#{"id_1": {"name": "IMIE", "surname": "NAZWISKO"}, "id_2": {"name": "IMIE", "surname": "NAZWISKO"}}
+app.patients={}
 app.next_patient_id=0
 app.users={"trudnY":"PaC13Nt"}
 app.sessions={}
@@ -39,8 +39,6 @@ def root():
     return {"message": "Hello World during the coronavirus pandemic!"}
 
 def check_cookie(session_token: str = Cookie(None)):
-    print(session_token)
-    print(app.sessions)
     if session_token not in app.sessions:
         session_token = None
     return session_token
@@ -55,8 +53,6 @@ def welcome(request: Request, response: Response, session_token: str = Depends(c
 
 def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
     correct = False
-    print(credentials.username)
-    print(credentials.password)
     for username, password in app.users.items():
         correct_username = secrets.compare_digest(credentials.username, username)
         correct_password = secrets.compare_digest(credentials.password, password)
@@ -76,8 +72,6 @@ def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
 @app.get("/login") # for easier testing in the browser
 @app.post("/login")
 def login(response: Response, session_token: str = Depends(login_check_cred)):
-    print("login")
-    print(session_token)
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/welcome"
     response.set_cookie(key="session_token", value=session_token)
@@ -104,7 +98,7 @@ class PatientRq(BaseModel):
     surname: str
 
 @app.post("/patient")
-def add_patient(response: Response, rq: PatientRq, session_token: str = Depends(check_cookie)):
+def add_patient(response: Response, name: str = Query(), surname: str = Query(), session_token: str = Depends(check_cookie)):
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
@@ -113,14 +107,12 @@ def add_patient(response: Response, rq: PatientRq, session_token: str = Depends(
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = f"/patient/{pid}"
     app.next_patient_id+=1
-    print(app.patients)
 
 @app.get("/patient")
 def get_all_patients(response: Response, session_token: str = Depends(check_cookie)):
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
-    print(app.patients)
     if len(app.patients) != 0:
         return app.patients
     response.status_code = status.HTTP_204_NO_CONTENT
@@ -130,9 +122,7 @@ def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK, se
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
-    print(pid)
     if pid in app.patients:
-        print(app.patients[pid])
         return app.patients[pid]
     response.status_code = status.HTTP_204_NO_CONTENT
 
@@ -141,7 +131,5 @@ def remove_patient(pid: str, response: Response, session_token: str = Depends(ch
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
-    print(app.patients)
     app.patients.pop(pid, None)
-    print(app.patients)
     response.status_code = status.HTTP_204_NO_CONTENT
