@@ -19,8 +19,8 @@ app.patients=[]
 
 security = HTTPBasic()
 
-app.users=[{"username":"trudnY", "password":"PaC13Nt"}]
-app.sessions=[]
+app.users={"trudnY":"PaC13Nt"}
+app.sessions={}
 
 # for debug
 @app.exception_handler(RequestValidationError)
@@ -41,9 +41,9 @@ def welcome():
 
 def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
     correct = False
-    for user in app.users:
-        correct_username = secrets.compare_digest(credentials.username, user.get("username"))
-        correct_password = secrets.compare_digest(credentials.password, user.get("password"))
+    for username, password in app.users.items():
+        correct_username = secrets.compare_digest(credentials.username, username)
+        correct_password = secrets.compare_digest(credentials.password, password)
         if (correct_username and correct_password):
             correct = True
     if not correct:
@@ -52,7 +52,9 @@ def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
             detail="Incorrect login or password",
             headers={"WWW-Authenticate": "Basic"},
         )
-    return sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
+    session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
+    app.sessions[session_token]=credentials.username
+    return session_token
 
 
 @app.post("/login")
