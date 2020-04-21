@@ -98,15 +98,18 @@ class PatientRq(BaseModel):
     surname: str
 
 @app.post("/patient")
-def add_patient(response: Response, name: str = Query(None), surname: str = Query(None), session_token: str = Depends(check_cookie)):
-    if session_token is None:
+def add_patient(response: Response, name: str = Query(), surname: str = Query(), session_token: str = Depends(check_cookie)):
+    print(name)
+    print(surname)
+    print("^^^^^^^^")
+    '''if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
     pid=f"id_{app.next_patient_id}"
     app.patients[pid]=rq.dict()
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = f"/patient/{pid}"
-    app.next_patient_id+=1
+    app.next_patient_id+=1'''
 
 @app.get("/patient")
 def get_all_patients(response: Response, session_token: str = Depends(check_cookie)):
