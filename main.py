@@ -108,6 +108,7 @@ def add_patient(response: Response, rq: PatientRq):
 
 @app.get("/patient")
 def get_all_patients(): 
+    print(app.patients)
     return app.patients
 
 @app.get("/patient/{pid}")
