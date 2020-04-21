@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field
 
 from functools import wraps
 # for debug
-'''from fastapi.encoders import jsonable_encoder
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse'''
+from fastapi.responses import JSONResponse
 # end
 
 from fastapi.templating import Jinja2Templates
@@ -24,13 +24,13 @@ app.users={"trudnY":"PaC13Nt"}
 app.sessions={}
 
 # for debug
-'''@app.exception_handler(RequestValidationError)
+@app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     print(jsonable_encoder({"detail": exc.errors(), "body": exc.body}))
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
-    )'''
+    )
 # end
 
 @app.get("/")
@@ -139,8 +139,8 @@ class WelcomeRq(BaseModel):
 @app.delete("/patient/{pid}")
 def remove_patient(rq: WelcomeRq, response: Response, session_token: str = Depends(check_cookie)):
     print(rq)
-    if session_token is None:
+    '''if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
     app.patients.pop(pid, None)
-    response.status_code = status.HTTP_204_NO_CONTENT
+    response.status_code = status.HTTP_204_NO_CONTENT'''
