@@ -46,7 +46,7 @@ def check_cookie(session_token: str = Cookie(None)):
 
 @app.get("/welcome")
 def welcome(session_token: str = Depends(check_cookie)):
-    return "Jakiś powitalny tekst!"
+    return "Jakiś powitalny tekst!!"
 
 def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
     correct = False
