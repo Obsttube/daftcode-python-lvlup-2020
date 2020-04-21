@@ -134,9 +134,9 @@ def get_patient(pid: str, response: Response, session_token: str = Depends(check
     response.status_code = status.HTTP_204_NO_CONTENT
 
 class WelcomeRq(BaseModel):
-    pass
+    pid: str
 
-@app.delete("/patient/{pid}")
+@app.delete("/patient/{rq}")
 def remove_patient(rq: WelcomeRq, response: Response, session_token: str = Depends(check_cookie)):
     print(rq)
     '''if session_token is None:
