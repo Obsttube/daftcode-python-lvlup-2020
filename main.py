@@ -13,9 +13,6 @@ from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
-from time import sleep
-import random
-
 import secrets
 
 app = FastAPI()
@@ -26,11 +23,6 @@ app.patients={}#{"id_1": {"name": "IMIE", "surname": "NAZWISKO"}, "id_2": {"name
 app.next_patient_id=0
 app.users={"trudnY":"PaC13Nt"}
 app.sessions={}
-app.testtt=random.random()
-
-@app.get("/test")
-def root():
-    return {"message": app.testtt}
 
 # for debug
 @app.exception_handler(RequestValidationError)
@@ -122,15 +114,14 @@ def get_all_patients(response: Response, session_token: str = Depends(check_cook
     if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Log in to access this page."
-    sleep(0.5) 
     print(app.patients)
     return app.patients
 
 @app.get("/patient/{pid}")
 def get_patient(pid: str, response: Response, status_code=status.HTTP_200_OK, session_token: str = Depends(check_cookie)):
-    if session_token is None:
+    '''if session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return "Log in to access this page."
+        return "Log in to access this page."'''
     print(pid)
     if pid in app.patients:
         print(app.patients[pid])
