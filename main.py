@@ -73,7 +73,7 @@ def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
 def login(response: Response, session_token: str = Depends(login_check_cred)):
     response = RedirectResponse(url='/welcome')
     response.status_code = status.HTTP_302_FOUND
-    response.headers["Location"] = "/welcome"
+    #response.headers["Location"] = "/welcome"
     response.set_cookie(key="session_token", value=session_token)
     return response
 
