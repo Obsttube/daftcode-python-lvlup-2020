@@ -7,9 +7,9 @@ from hashlib import sha256
 import secrets
 
 # for debug
-'''from fastapi.encoders import jsonable_encoder
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse'''
+from fastapi.responses import JSONResponse
 # end
 
 app = FastAPI()
@@ -24,13 +24,13 @@ app.sessions={}
 MESSAGE_UNAUTHORIZED = "Log in to access this page."
 
 # for debug
-'''@app.exception_handler(RequestValidationError)
+@app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     print(jsonable_encoder({"detail": exc.errors(), "body": exc.body}))
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
-    )'''
+    )
 # end
 
 @app.get("/")
@@ -71,11 +71,11 @@ def login_check_cred(credentials: HTTPBasicCredentials = Depends(security)):
 #@app.get("/login") # for easier testing in the browser
 @app.post("/login")
 def login(response: Response, session_token: str = Depends(login_check_cred)):
-    response = RedirectResponse(url='/welcome')
-    response.status_code = status.HTTP_302_FOUND
+    #response = RedirectResponse(url='/welcome')
+    #response.status_code = status.HTTP_302_FOUND
     #response.headers["Location"] = "/welcome"
-    response.set_cookie(key="session_token", value=session_token)
-    return response
+    #response.set_cookie(key="session_token", value=session_token)
+    return RedirectResponse(url='/welcome')
 
 #@app.get("/logout") # for easier testing in the browser
 @app.post("/logout")
