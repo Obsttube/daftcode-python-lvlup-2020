@@ -56,10 +56,8 @@ async def tracks_composers(response: Response, album_id: int):
 	cursor = await router.db_connection.execute("SELECT * FROM albums WHERE AlbumId = ?",
 		(album_id, ))
 	album = await cursor.fetchone()
-	print(dict(album))
+	print(dict(album)) #{'AlbumId': 348, 'Title': 'Mandaryna HITS', 'ArtistId': 1}
 	if album is None:
 		response.status_code = status.HTTP_404_NOT_FOUND
 		return {"detail":{"error":"Album with that ID does not exist."}}
-	a=dict(album)
-	a[0]=0
-	return a
+	return album
