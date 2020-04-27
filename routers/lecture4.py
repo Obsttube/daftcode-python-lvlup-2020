@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Response, status
+from pydantic import BaseModel
 import aiosqlite
 
 router = APIRouter()
@@ -20,12 +21,42 @@ async def tracks(page: int = 0, per_page: int = 10):
 	return tracks
 
 @router.get("/tracks/composers")
-async def tracks_composers(response: Response, composer_name: str="1Angus Young, Malcolm Young, Brian Johnson"):
+async def tracks_composers(response: Response, composer_name: str):
 	router.db_connection.row_factory = lambda cursor, x: x[0]
 	cursor = await router.db_connection.execute("SELECT Name FROM tracks WHERE Composer = ? ORDER BY Name",
 		(composer_name, ))
 	tracks = await cursor.fetchall()
 	if len(tracks) == 0:
 		response.status_code = status.HTTP_404_NOT_FOUND
-		return {"detail":{"error":"Can't find any songs of that composer."}}
+		return {"detail":{"error":"Cannot find any songs of that composer."}}
 	return tracks
+
+class Album(BaseModel):
+    title: str
+    artist_id: int
+
+@router.post("/albums")
+async def add_album(response: Response, album: Album, status_code = 201):
+	router.db_connection.row_factory = None
+	cursor = await router.db_connection.execute("SELECT ArtistId FROM artists WHERE ArtistId = ?",
+		(album.artist_id, ))
+	result = await cursor.fetchone()
+	if result is None:
+		response.status_code = status.HTTP_404_NOT_FOUND
+		return {"detail":{"error":"Artist with that ID does not exist."}}
+	cursor = await router.db_connection.execute("INSERT INTO albums (Title, ArtistId) VALUES (?, ?)",
+		(album.title, album.artist_id))
+	await router.db_connection.commit()
+	return {"AlbumId": cursor.lastrowid, "Title": album.title, "ArtistId": album.artist_id}
+
+@router.get("/albums/{album_id}")
+async def tracks_composers(response: Response, album_id: int):
+	router.db_connection.row_factory = aiosqlite.Row
+	cursor = await router.db_connection.execute("SELECT * FROM albums WHERE AlbumId = ?",
+		(album_id, ))
+	album = await cursor.fetchone()
+	print(album)
+	if album is None:
+		response.status_code = status.HTTP_404_NOT_FOUND
+		return {"detail":{"error":"Album with that ID does not exist."}}
+	return album
