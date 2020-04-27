@@ -57,7 +57,7 @@ async def tracks_composers(response: Response, album_id: int):
 		(album_id, ))
 	album = await cursor.fetchone()
 	print(dict(album)) #{'AlbumId': 348, 'Title': 'Mandaryna HITS', 'ArtistId': 1}
-	if album is None:
+	'''if album is None:
 		response.status_code = status.HTTP_404_NOT_FOUND
-		return {"detail":{"error":"Album with that ID does not exist."}}
+		return {"detail":{"error":"Album with that ID does not exist."}}'''
 	return album
