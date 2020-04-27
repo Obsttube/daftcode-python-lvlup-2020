@@ -36,7 +36,7 @@ class Album(BaseModel):
     artist_id: int
 
 @router.post("/albums")
-async def add_album(response: Response, album: Album, status_code = 201):
+async def add_album(response: Response, album: Album):
 	router.db_connection.row_factory = None
 	cursor = await router.db_connection.execute("SELECT ArtistId FROM artists WHERE ArtistId = ?",
 		(album.artist_id, ))
@@ -47,6 +47,7 @@ async def add_album(response: Response, album: Album, status_code = 201):
 	cursor = await router.db_connection.execute("INSERT INTO albums (Title, ArtistId) VALUES (?, ?)",
 		(album.title, album.artist_id))
 	await router.db_connection.commit()
+	response.status_code = status.HTTP_201_CREATED
 	return {"AlbumId": cursor.lastrowid, "Title": album.title, "ArtistId": album.artist_id}
 
 @router.get("/albums/{album_id}")
