@@ -36,7 +36,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # lecture no. 4
 
 @app.get("/tracks")
-def tracks(page: int = 0, per_page: int = 10):
+async def tracks(page: int = 0, per_page: int = 10):
     tracks = await app.db_connection.execute("SELECT * FROM tracks LIMIT :per_page OFFSET :per_page*:page ORDER BY TrackId",
         {'page': page, 'per_page': per_page}).fetchall()
     return tracks
