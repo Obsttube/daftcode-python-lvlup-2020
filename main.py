@@ -38,6 +38,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @app.on_event("startup")
 async def startup():
     app.db_connection = await aiosqlite.connect('chinook.db')
+    app.db_connection.row_factory = aiosqlite.Row
 
 @app.on_event("shutdown")
 async def shutdown():
