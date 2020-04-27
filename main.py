@@ -3,8 +3,8 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from hashlib import sha256
-import aiosqlite
 import secrets
+from routers import lecture4
 
 # for debug
 from fastapi.encoders import jsonable_encoder
@@ -21,6 +21,8 @@ app.next_patient_id=0
 app.users={"trudnY":"PaC13Nt"}
 app.sessions={}
 
+app.include_router(lecture4.router)
+
 MESSAGE_UNAUTHORIZED = "Log in to access this page."
 
 # for debug
@@ -31,26 +33,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
     )
-# end
-
-# lecture no. 4
-
-@app.on_event("startup")
-async def startup():
-    app.db_connection = await aiosqlite.connect('chinook.db')
-    app.db_connection.row_factory = aiosqlite.Row
-
-@app.on_event("shutdown")
-async def shutdown():
-    await app.db_connection.close()
-
-@app.get("/tracks")
-async def tracks(page: int = 0, per_page: int = 10):
-    cursor = await app.db_connection.execute("SELECT * FROM tracks ORDER BY TrackId LIMIT :per_page OFFSET :per_page*:page",
-        {'page': page, 'per_page': per_page})
-    tracks = await cursor.fetchall()
-    return tracks
-
 # end
 
 @app.get("/")
