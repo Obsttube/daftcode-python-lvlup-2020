@@ -35,22 +35,22 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 # lecture no. 4
 
-@app.get("/tracks")
-async def tracks(page: int = 0, per_page: int = 10):
-    tracks = await app.db_connection.execute("SELECT * FROM tracks LIMIT :per_page OFFSET :per_page*:page ORDER BY TrackId",
-        {'page': page, 'per_page': per_page}).fetchall()
-    return tracks
-
-# end
-
 @app.on_event("startup")
 async def startup():
     app.db_connection = await aiosqlite.connect('chinook.db')
 
-
 @app.on_event("shutdown")
 async def shutdown():
     await app.db_connection.close()
+
+@app.get("/tracks")
+async def tracks(page: int = 0, per_page: int = 10):
+    cursor = await app.db_connection.execute("SELECT * FROM tracks ORDER BY TrackId LIMIT :per_page OFFSET :per_page*:page",
+        {'page': page, 'per_page': per_page})
+    tracks = await cursor.fetchall()
+    return tracks
+
+# end
 
 @app.get("/")
 def root():
