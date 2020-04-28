@@ -108,6 +108,15 @@ async def tracks_composers(response: Response, category: str):
 			"GROUP BY invoices.CustomerId ORDER BY Sum DESC, invoices.CustomerId")
 		stats = await cursor.fetchall()
 		return stats
+	if category == "genres":
+		router.db_connection.row_factory = aiosqlite.Row
+		cursor = await router.db_connection.execute(
+			"SELECT genres.Name, SUM(Quantity) AS Sum FROM invoice_items "
+			"JOIN tracks ON invoice_items.TrackId = tracks.TrackId "
+			"JOIN genres ON tracks.GenreId = genres.GenreId "
+			"GROUP BY tracks.GenreId ORDER BY Sum DESC, genres.Name")
+		stats = await cursor.fetchall()
+		return stats
 	else:
 		response.status_code = status.HTTP_404_NOT_FOUND
 		return {"detail":{"error":"Unsuported category."}}
