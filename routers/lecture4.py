@@ -105,7 +105,7 @@ async def tracks_composers(response: Response, category: str):
 		cursor = await router.db_connection.execute(
 			"SELECT invoices.CustomerId, Email, Phone, ROUND(SUM(Total), 2) AS Sum "
 			"FROM invoices JOIN customers on invoices.CustomerId = customers.CustomerId "
-			"GROUP BY invoices.CustomerId ORDER BY Sum, CustomerId")
+			"GROUP BY invoices.CustomerId ORDER BY Sum, invoices.CustomerId")
 		stats = await cursor.fetchall()
 		return stats
 	else:
