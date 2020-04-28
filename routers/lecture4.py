@@ -97,5 +97,5 @@ async def tracks_composers(response: Response, customer_id: int, customer: Custo
 	cursor = await router.db_connection.execute("SELECT * FROM customers WHERE CustomerId = ?",
 		(customer_id, ))
 	customer = await cursor.fetchone()
-	print(dict(customer))
+	print(customer)
 	return customer
