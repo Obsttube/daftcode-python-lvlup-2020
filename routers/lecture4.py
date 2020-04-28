@@ -79,7 +79,7 @@ async def tracks_composers(response: Response, customer_id: int, customer: Custo
 		response.status_code = status.HTTP_404_NOT_FOUND
 		return {"detail":{"error":"Customer with that ID does not exist."}}
 	update_customer = customer.dict(exclude_unset=True)
-	values = dict(update_customer.values())
+	values = list(update_customer.values())
 	if len(values) != 0:
 		values.append(customer_id)
 		query = "UPDATE customers SET "
