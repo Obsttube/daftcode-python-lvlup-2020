@@ -103,9 +103,9 @@ async def tracks_composers(response: Response, category: str):
 	if category == "customers":
 		router.db_connection.row_factory = aiosqlite.Row
 		cursor = await router.db_connection.execute(
-			"SELECT invoices.CustomerId, Email, Phone, ROUND(SUM(Total), 2) AS Sum "
+			"SELECT invoices.CustomerId, Email, Phone, ROUND(MAX(Total), 2) AS Sum "
 			"FROM invoices JOIN customers on invoices.CustomerId = customers.CustomerId "
-			"GROUP BY invoices.CustomerId ORDER BY Sum, invoices.CustomerId")
+			"GROUP BY invoices.CustomerId")
 		stats = await cursor.fetchall()
 		return stats
 	else:
