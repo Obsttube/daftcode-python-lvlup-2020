@@ -97,3 +97,17 @@ async def tracks_composers(response: Response, customer_id: int, customer: Custo
 		(customer_id, ))
 	customer = await cursor.fetchone()
 	return customer
+
+@router.get("/sales")
+async def tracks_composers(response: Response, category: str):
+	if category == "customers":
+		router.db_connection.row_factory = aiosqlite.Row
+		cursor = await router.db_connection.execute(
+			"SELECT invoices.CustomerId, Email, Phone, ROUND(SUM(Total), 2) AS Sum "
+			"FROM invoices JOIN customers on invoices.CustomerId = customers.CustomerId "
+			"GROUP BY invoices.CustomerId ORDER BY Sum, CustomerId")
+		stats = await cursor.fetchall()
+		return stats
+	else:
+		response.status_code = status.HTTP_404_NOT_FOUND
+		return {"detail":{"error":"Unsuported category."}}
