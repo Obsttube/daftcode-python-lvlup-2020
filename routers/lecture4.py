@@ -92,11 +92,8 @@ async def tracks_composers(response: Response, customer_id: int, customer: Custo
 		query += " WHERE CustomerId = ?"
 		cursor = await router.db_connection.execute(query, tuple(values))
 		await router.db_connection.commit()
-	print(query)
-	print(values)
 	router.db_connection.row_factory = aiosqlite.Row
 	cursor = await router.db_connection.execute("SELECT * FROM customers WHERE CustomerId = ?",
 		(customer_id, ))
 	customer = await cursor.fetchone()
-	print(customer)
 	return customer
