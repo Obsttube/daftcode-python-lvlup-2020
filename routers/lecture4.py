@@ -55,7 +55,7 @@ async def tracks_composers(response: Response, album_id: int):
 	router.db_connection.row_factory = aiosqlite.Row
 	cursor = await router.db_connection.execute("SELECT * FROM albums WHERE AlbumId = ?",
 		(album_id, ))
-	album = await cursor.fetchall() # TODO: Change to .fetchone() after Replit tests are fixed.
+	album = await cursor.fetchone()
 	if album is None: # Not required by tests, but why not :)
 		response.status_code = status.HTTP_404_NOT_FOUND
 		return {"detail":{"error":"Album with that ID does not exist."}}
