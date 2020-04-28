@@ -59,5 +59,4 @@ async def tracks_composers(response: Response, album_id: int):
 	if album is None: # Not required by tests, but why not :)
 		response.status_code = status.HTTP_404_NOT_FOUND
 		return {"detail":{"error":"Album with that ID does not exist."}}
-	print(dict(album))
-	return dict(album)
+	return album
