@@ -32,8 +32,8 @@ async def tracks_composers(response: Response, composer_name: str):
 	return tracks
 
 class Album(BaseModel):
-    title: str
-    artist_id: int
+	title: str
+	artist_id: int
 
 @router.post("/albums")
 async def add_album(response: Response, album: Album):
@@ -60,3 +60,39 @@ async def tracks_composers(response: Response, album_id: int):
 		response.status_code = status.HTTP_404_NOT_FOUND
 		return {"detail":{"error":"Album with that ID does not exist."}}
 	return album
+
+class Customer(BaseModel):
+	company: str = None
+	address: str = None
+	city: str = None
+	state: str = None
+	country: str = None
+	postalcode: str = None
+	fax: str = None
+
+@router.put("/customers/{customer_id}")
+async def tracks_composers(response: Response, customer_id: int, customer: Customer):
+	cursor = await router.db_connection.execute("SELECT CustomerId FROM customers WHERE CustomerId = ?",
+		(customer_id, ))
+	result = await cursor.fetchone()
+	if result is None:
+		response.status_code = status.HTTP_404_NOT_FOUND
+		return {"detail":{"error":"Customer with that ID does not exist."}}
+	update_customer = customer.dict(exclude_unset=True)
+	values = update_customer.dict().values()
+	if len(values) != 0:
+		values.append(customer_id)
+		query = "UPDATE customers SET "
+		for key, value in update_customer.dict().items():
+			key.capitalize()
+			if key == "Postalcode":
+				key = "PostalCode"
+			query += f"{key}=?, "
+		query = query[:-2]
+		query += " WHERE CustomerId = ?"
+		cursor = await router.db_connection.execute(query, tuple(values))
+		await router.db_connection.commit()
+	cursor = await router.db_connection.execute("SELECT * FROM customers WHERE CustomerId = ?",
+		(customer_id, ))
+	customer = await cursor.fetchone()
+	return customer
